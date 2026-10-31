@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Partidos · Champions Predictions</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link th:href="@{/css/app.css}" rel="stylesheet">
+</head>
+<body>
+
+<nav class="navbar navbar-dark py-3">
+  <div class="container">
+    <a class="navbar-brand fw-bold" th:href="@{/}"><span class="brand-icon">&#10022;</span>Champions Predictions</a>
+    <span class="badge text-bg-light rounded-pill">3 CAPAS · SPRING BOOT</span>
+  </div>
+</nav>
+
+<main class="container py-4 py-md-5">
+
+  <ul class="nav nav-pills gap-1 mb-4">
+    <li class="nav-item"><a class="nav-link" th:href="@{/}">Inicio</a></li>
+    <li class="nav-item"><a class="nav-link active" th:href="@{/partidos}">Partidos</a></li>
+    <li class="nav-item"><a class="nav-link" th:href="@{/predicciones}">Predicciones</a></li>
+  </ul>
+
+  <div th:if="${exito}" class="alert alert-success alert-dismissible fade show" role="alert">
+    <span th:text="${exito}"></span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+  <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+    <span th:text="${error}"></span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+
+  <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+    <div>
+      <h1 class="h4 section-title mb-1">Cartelera de partidos</h1>
+      <span class="small-label">Elige un encuentro para registrar tu pronóstico.</span>
+    </div>
+    <form class="d-flex flex-wrap gap-2" method="get" th:action="@{/partidos}">
+      <input type="search" class="form-control" style="width:220px;max-width:100%" name="q" th:value="${q}" placeholder="Buscar equipo…" aria-label="Buscar equipo">
+      <select class="form-select" style="width:190px" name="fase" aria-label="Filtrar fase" onchange="this.form.submit()">
+        <option value="">Todas las fases</option>
+        <option th:each="f : ${fases}" th:value="${f}" th:text="${f}" th:selected="${f == faseSel}"></option>
+      </select>
+      <button class="btn btn-primary" type="submit">Buscar</button>
+    </form>
+  </div>
+
+  <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4" th:if="${!#lists.isEmpty(partidos)}">
+    <div class="col" th:each="p : ${partidos}">
+      <article class="card match-card p-4">
+        <div class="d-flex justify-content-between align-items-center match-top mb-4">
+          <span th:text="${p.fase}"></span>
+          <span class="badge badge-soft rounded-pill" th:text="${p.origen}"></span>
+        </div>
+        <div class="row align-items-center text-center g-1">
+          <div class="col-5">
+            <div class="team-symbol" th:text="${#strings.toUpperCase(#strings.substring(p.equipoLocal,0,3))}"></div>
+            <div class="team-name" th:text="${p.equipoLocal}"></div>
+          </div>
+          <div class="col-2 score-vs">VS</div>
+          <div class="col-5">
+            <div class="team-symbol" th:text="${#strings.toUpperCase(#strings.substring(p.equipoVisitante,0,3))}"></div>
+            <div class="team-name" th:text="${p.equipoVisitante}"></div>
+          </div>
+        </div>
+        <div class="text-center small-label mt-3 mb-4" th:text="${#temporals.format(p.fechaHora, 'dd MMM yyyy · HH:mm')}"></div>
+        <button type="button" class="btn btn-primary w-100 btn-predecir"
+                th:attr="data-id=${p.id}, data-local=${p.equipoLocal}, data-visitante=${p.equipoVisitante}">
+          Registrar predicción
+        </button>
+        <a class="btn btn-link text-decoration-none small mt-1" th:href="@{/predicciones}"
+           th:text="'Ver predicciones (' + ${conteos.get(p.id)} + ')'"></a>
+      </article>
+    </div>
+  </div>
+
+  <div th:if="${#lists.isEmpty(partidos)}" class="empty card">
+    No hay partidos que coincidan con tu búsqueda.
+  </div>
+
+</main>
+
+<footer class="container d-flex flex-wrap justify-content-between gap-2 border-top mt-4 pt-4 pb-4">
+  <span>&#10022; Champions Predictions · Laboratorio en 3 capas</span>
+  <span>Datos simulados · Sin afiliación oficial</span>
+</footer>
+
+<!-- MODAL: registrar prediccion -->
+<div class="modal fade" id="prediccionModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 rounded-4">
+      <div class="modal-header border-0 px-4 pt-4">
+        <h2 class="modal-title fs-5 fw-bold">Registrar predicción</h2>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body px-4 pb-4">
+        <div id="modalMatch" class="text-center bg-light rounded-3 p-3 mb-4 fw-semibold"></div>
+        <form id="prediccionForm" th:action="@{/predicciones}" method="post">
+          <input type="hidden" id="partidoId" name="partidoId">
+          <label class="form-label small fw-semibold" for="resultado">Resultado esperado</label>
+          <select class="form-select mb-4" id="resultado" name="resultado" required>
+            <option value="">Selecciona un resultado</option>
+            <option value="LOCAL">Gana el local</option>
+            <option value="EMPATE">Empate</option>
+            <option value="VISITANTE">Gana el visitante</option>
+          </select>
+          <div class="row g-3 mb-3">
+            <div class="col-6">
+              <label class="form-label small" id="labelLocal" for="golesLocal">Goles local</label>
+              <input type="number" class="form-control text-center fs-4" id="golesLocal" name="golesLocal" min="0" max="99" step="1" required>
+            </div>
+            <div class="col-6">
+              <label class="form-label small" id="labelVisitante" for="golesVisitante">Goles visitante</label>
+              <input type="number" class="form-control text-center fs-4" id="golesVisitante" name="golesVisitante" min="0" max="99" step="1" required>
+            </div>
+          </div>
+          <p class="small-label">El resultado seleccionado debe coincidir con el marcador. Puedes registrar más de una predicción por partido.</p>
+          <button class="btn btn-primary w-100 py-2" type="submit">Guardar predicción</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>

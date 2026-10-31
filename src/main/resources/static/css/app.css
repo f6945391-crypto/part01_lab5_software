@@ -1,0 +1,42 @@
+:root { --navy: #101c43; --accent: #5268ff; }
+
+body { background: #f3f5fa; color: #19233e; font-family: system-ui, sans-serif; }
+
+.navbar { background: var(--navy); }
+.brand-icon { background: #5268ff; border-radius: 12px; padding: 7px 12px; margin-right: 10px; }
+
+.hero { background: linear-gradient(115deg, #101c43, #273d89); color: white; border-radius: 24px; padding: 38px; position: relative; overflow: hidden; }
+.hero:after { content: '\2726'; position: absolute; right: 35px; top: -65px; font-size: 260px; color: #ffffff09; pointer-events: none; }
+.eyebrow { font-size: .73rem; letter-spacing: 2px; font-weight: 700; }
+
+.card { border: 0; border-radius: 18px; box-shadow: 0 4px 22px #17275307; }
+.stat-value { font-size: 2rem; font-weight: 750; }
+.muted { color: #778097; }
+
+.btn-primary { background: #5268ff; border-color: #5268ff; }
+.btn { border-radius: 10px; }
+
+.nav-pills .nav-link { color: #64708a; font-weight: 600; }
+.nav-pills .nav-link.active { background: #e8ecff; color: #4054db; }
+
+.team-symbol { width: 49px; height: 49px; border-radius: 50%; background: #eef1fc; display: flex; align-items: center; justify-content: center; font-size: .9rem; font-weight: 800; color: #344b9c; margin: auto auto 12px; }
+.team-name { font-size: .9rem; font-weight: 650; min-height: 42px; }
+.match-card { height: 100%; }
+.match-top { font-size: .73rem; color: #79829a; }
+.score-vs { color: #a2abc0; font-weight: 800; }
+
+.section-title { font-weight: 750; letter-spacing: -.5px; }
+.badge-soft { background: #eef1ff; color: #4b60d3; font-weight: 600; }
+.form-control, .form-select { border-radius: 10px; padding: 10px 13px; border-color: #e0e4ee; }
+footer { color: #8991a5; font-size: .8rem; }
+.empty { padding: 50px; text-align: center; color: #778097; }
+.notice { background: #fff8e9; color: #806223; border: 1px solid #f4e5bf; border-radius: 12px; font-size: .85rem; }
+.small-label { color: #778097; font-size: .8rem; }
+.pred-score { font-size: 1.8rem; font-weight: 800; color: #334dcc; }
+
+@media (max-width: 575px) {
+  .hero { padding: 25px; }
+  .hero h1 { font-size: 1.8rem; }
+  .navbar-brand { font-size: 1rem; }
+  .stat-value { font-size: 1.6rem; }
+}
